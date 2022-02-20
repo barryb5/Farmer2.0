@@ -17,14 +17,21 @@ import java.util.concurrent.*;
 
 public class Main {
 
-    public static void main(String[] args) throws AWTException, IOException, InterruptedException, NoSuchFileException {
-
+    public static void main(String[] args) throws AWTException, IOException, InterruptedException, NoSuchFileException, ExecutionException {
+        Thread botSendThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Bot Send thread running");
+                Bot bot = new Bot("send");
+                bot.main(null);
+            }
+        });
 
         Thread botThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 System.out.println("Bot thread running");
-                Bot bot = new Bot();
+                Bot bot = new Bot("bot");
                 bot.main(null);
             }
         });
@@ -34,16 +41,10 @@ public class Main {
             public void run() {
                 System.out.println("Safety Net thread running");
 
-                SafetyNet safety = null;
-                try {
-                    safety = new SafetyNet();
-                } catch (AWTException e) {
-                    e.printStackTrace();
-                }
+                SafetyNet safety = new SafetyNet();
 
                 try {
                     safety.safeMacro();
-                    safety.checkIfSomeoneJoinedIslandRecently();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
@@ -76,100 +77,26 @@ public class Main {
 //                    farmer.sugarcane();
 //                    farmer.pumpkin();
 //                    farmer.forage();
-//                    farmer.goblino();
+//                    farmver.goblino();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (AWTException e) {
                     e.printStackTrace();
 //                } catch (ExecutionException e) {
-//                    e.printStackTrace();
+//                    e.printStackTrace();d
                 }
 
 
             }
         });
 //        File file = new File("/home/barry/projects/java/Farmer2.0/src/main/resources/StoredData.xls");
+
         farmerThread.start();
-        Thread.sleep(5000);
         safetyNetThread.start();
         botThread.start();
-/*
-        Robot robot = null;
-        try {
-            robot = new Robot();
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
+        botSendThread.start();
 
-//        robot.mouseMove(2880, 650);
-///*
-        Bot bot = new Bot();
 
-        robot.mouseMove(0, 0);
-
-        int currentX = 0;
-        int currentY = 0;
-
-        Thread.sleep(3000);
-
-        while (true) {
-            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-            robot.keyPress(KeyEvent.VK_A);
-            Thread.sleep(17000);
-            robot.keyRelease(KeyEvent.VK_A);
-            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-            robot.keyPress(KeyEvent.VK_W);
-            Thread.sleep(500);
-            robot.keyRelease(KeyEvent.VK_W);
-
-            robot.keyPress(KeyEvent.VK_D);
-            Thread.sleep(500);
-            robot.keyRelease(KeyEvent.VK_D);
-
-            robot.keyPress(KeyEvent.VK_S);
-            Thread.sleep(500);
-            robot.keyRelease(KeyEvent.VK_S);
-
-            currentX = (int) MouseInfo.getPointerInfo().getLocation().getX();
-            currentY = (int) MouseInfo.getPointerInfo().getLocation().getY();
-            System.out.println(currentX + ", " +  currentY);
-            robot.mouseMove(currentX + 875, currentY);
-
-            robot.keyPress(KeyEvent.VK_D);
-            Thread.sleep(200);
-            robot.keyRelease(KeyEvent.VK_D);
-
-            Thread.sleep(1000);
-
-            // Second half
-
-            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-            robot.keyPress(KeyEvent.VK_D);
-            Thread.sleep(17000);
-            robot.keyRelease(KeyEvent.VK_D);
-            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-            robot.keyPress(KeyEvent.VK_W);
-            Thread.sleep(500);
-            robot.keyRelease(KeyEvent.VK_W);
-
-            robot.keyPress(KeyEvent.VK_A);
-            Thread.sleep(500);
-            robot.keyRelease(KeyEvent.VK_A);
-
-            robot.keyPress(KeyEvent.VK_S);
-            Thread.sleep(500);
-            robot.keyRelease(KeyEvent.VK_S);
-
-            currentX = (int) MouseInfo.getPointerInfo().getLocation().getX();
-            currentY = (int) MouseInfo.getPointerInfo().getLocation().getY();
-            System.out.println(currentX + ", " +  currentY);
-            robot.mouseMove(currentX - 875, currentY);
-
-            robot.keyPress(KeyEvent.VK_A);
-            Thread.sleep(200);
-            robot.keyRelease(KeyEvent.VK_A);
-        }
-*/
 /*
         Robot robot = new Robot();
         String format = "jpg";

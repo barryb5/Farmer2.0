@@ -11,12 +11,9 @@ public class OnlineLogger {
     final private static UUID[] uuids = {UUID.fromString("fb3d9649-8a5b-4d5b-91b7-63db14b195ad"), UUID.fromString("1277d71f-3380-46e2-98d9-0c9fe4055f00"), UUID.fromString("0738b6b4-55e6-45ba-853d-a98a705bcbb5"), UUID.fromString("19e11796-f966-4993-8818-5e79a95c6a42")};
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-
-        Bot bot = new Bot();
-
         while (true) {
             for (int i = 0; i < users.length; i++) {
-                String info = bot.getInfo(uuids[i]);
+                String info = APIForHypixelData.getInfo(uuids[i]);
 
                 updateInfo(info, users[i]);
 

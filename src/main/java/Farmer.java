@@ -15,15 +15,12 @@ public class Farmer {
         robot = new Robot();
     }
 
-
-
     public void forage() throws InterruptedException {
         int currentX = 0;
         int currentY = 0;
 
         Random random = new Random();
 
-        Bot bot = new Bot();
 
         System.out.println("Foraging Farm Thread running");
 
@@ -125,10 +122,73 @@ public class Farmer {
         }
     }
 
+    public static void unstuck() {
+        Robot robot = null;
+
+        try {
+            robot = new Robot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+
+        robot.keyPress(KeyEvent.VK_SPACE);
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        robot.keyRelease(KeyEvent.VK_SPACE);
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        robot.keyPress(KeyEvent.VK_SPACE);
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        robot.keyRelease(KeyEvent.VK_SPACE);
+
+        robot.keyPress(KeyEvent.VK_SPACE);
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        robot.keyRelease(KeyEvent.VK_SPACE);
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        robot.keyPress(KeyEvent.VK_SPACE);
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        robot.keyRelease(KeyEvent.VK_SPACE);
+
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        robot.keyPress(KeyEvent.VK_SHIFT);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        robot.keyRelease(KeyEvent.VK_SHIFT);
+    }
+
     public void sugarcane() throws ExecutionException, InterruptedException, AWTException {
         Random random = new Random();
 
-        Bot bot = new Bot();
 
         System.out.println("Sugarcane Farm Thread running");
 
@@ -368,7 +428,7 @@ public class Farmer {
         robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
         Thread.sleep(200);
 
-        while (true) {
+        while (SafetyNet.isRunning()) {
             // Walk left
             robot.keyPress(KeyEvent.VK_A);
             Thread.sleep(34500 + (random.nextInt(100) + 250));
@@ -380,7 +440,6 @@ public class Farmer {
             Thread.sleep(50);
             robot.keyRelease(KeyEvent.VK_CONTROL);
             Thread.sleep(1000);
-
             robot.keyRelease(KeyEvent.VK_W);
 
             // Walk right
@@ -398,13 +457,16 @@ public class Farmer {
             Thread.sleep(50);
             robot.keyRelease(KeyEvent.VK_CONTROL);
             Thread.sleep(1000);
-
             robot.keyRelease(KeyEvent.VK_W);
+
         }
+        System.out.println("Stopping attempt");
+
+        releaseAll();
+
+        System.out.println("Stop succeeded");
     }
     public void pumpkin() throws ExecutionException, InterruptedException, AWTException {
-        Bot bot = new Bot();
-
         robot.mouseMove(0, 0);
 
         Thread.sleep(2000);
@@ -524,6 +586,7 @@ public class Farmer {
         for (int i = 65; i < 122; i++) {
             robot.keyRelease(i);
         }
+        robot.mousePress(1);
         robot.mouseRelease(1);
     }
 }
