@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutionException;
 
 public class APIForHypixelData {
     // API Key (from Hypixel /api new)
-    final private static String KEY = "be0e1c79-1314-48bf-950b-cda383c93ee5";
+    final private static String KEY = "ba274333-c742-47f0-86d9-768e2415fb97";
     // UUID of Eggrollean so it can get the right player from the Hypixel API
     final private static UUID Eggrollean = UUID.fromString("09be77df-bb8a-4325-aaf9-29e4c5da8955");
     public APIForHypixelData() {

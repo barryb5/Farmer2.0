@@ -7,23 +7,30 @@ import org.apache.commons.io.input.ReversedLinesFileReader;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.NoSuchFileException;
+import java.sql.SQLOutput;
 import java.util.UUID;
 import java.util.concurrent.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 
 public class Main {
 
-    public static void main(String[] args) throws AWTException, IOException, InterruptedException, NoSuchFileException, ExecutionException {
+    public static void main(String[] args) throws AWTException, IOException, InterruptedException, NoSuchFileException, ExecutionException, UnsupportedFlavorException {
         Thread botSendThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 System.out.println("Bot Send thread running");
-                Bot bot = new Bot("send");
-                bot.main(null);
+                Bot bot = new Bot();
+                bot.interactiveBot();
             }
         });
 
@@ -31,8 +38,8 @@ public class Main {
             @Override
             public void run() {
                 System.out.println("Bot thread running");
-                Bot bot = new Bot("bot");
-                bot.main(null);
+                Bot bot = new Bot();
+                bot.sendUpdates();
             }
         });
 
@@ -53,6 +60,29 @@ public class Main {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (UnsupportedFlavorException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        Thread stopAfterTimeThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    String time = java.time.LocalTime.now().toString();
+                    System.out.println("Time: " + time);
+                    if (time.substring(0, 5).equals("05:28")) {
+                        System.out.println("Done now");
+                        System.exit(0);
+                    }
+
+
+                    try {
+                        Thread.sleep(30000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -70,20 +100,27 @@ public class Main {
 
                 Farmer farmer = null;
 
-                try {
-                    farmer = new Farmer();
+                while (true) {
+                    try {
+                        farmer = new Farmer();
 //                    farmer.alchemy();
-                    farmer.netherwart();
+                        farmer.netherwart();
 //                    farmer.sugarcane();
 //                    farmer.pumpkin();
 //                    farmer.forage();
 //                    farmver.goblino();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (AWTException e) {
-                    e.printStackTrace();
+//                    farmer.moveMouse(180, 0);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (AWTException e) {
+                        e.printStackTrace();
 //                } catch (ExecutionException e) {
-//                    e.printStackTrace();d
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } catch (UnsupportedFlavorException e) {
+//                    e.printStackTrace();
+                    }
                 }
 
 
@@ -91,12 +128,19 @@ public class Main {
         });
 //        File file = new File("/home/barry/projects/java/Farmer2.0/src/main/resources/StoredData.xls");
 
+//        Thread.sleep(4000);
+//        Robot robot = new Robot();
+//        robot.mouseMove(0, 0);
+//        Thread.sleep(4000);
+//        robot.mouseMove(400, 300);
+
+
+
         farmerThread.start();
         safetyNetThread.start();
         botThread.start();
         botSendThread.start();
-
-
+        stopAfterTimeThread.start();
 /*
         Robot robot = new Robot();
         String format = "jpg";

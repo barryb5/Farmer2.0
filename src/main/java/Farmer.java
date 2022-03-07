@@ -1,8 +1,12 @@
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.security.Key;
 import java.util.Random;
 import java.util.UUID;
@@ -10,9 +14,11 @@ import java.util.concurrent.ExecutionException;
 
 public class Farmer {
     Robot robot;
+    public static boolean unstucking;
 
     public Farmer() throws AWTException {
         robot = new Robot();
+        unstucking = false;
     }
 
     public void forage() throws InterruptedException {
@@ -123,6 +129,14 @@ public class Farmer {
     }
 
     public static void unstuck() {
+        if (unstucking == true) {
+            System.out.println("Already unstucking");
+            return;
+        } else {
+            System.out.println("Set unstucking to true");
+            unstucking = true;
+        }
+
         Robot robot = null;
 
         try {
@@ -145,11 +159,12 @@ public class Farmer {
         }
         robot.keyPress(KeyEvent.VK_SPACE);
         try {
-            Thread.sleep(50);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         robot.keyRelease(KeyEvent.VK_SPACE);
+
 
         robot.keyPress(KeyEvent.VK_SPACE);
         try {
@@ -179,11 +194,13 @@ public class Farmer {
 
         robot.keyPress(KeyEvent.VK_SHIFT);
         try {
-            Thread.sleep(5000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         robot.keyRelease(KeyEvent.VK_SHIFT);
+
+        unstucking = false;
     }
 
     public void sugarcane() throws ExecutionException, InterruptedException, AWTException {
@@ -421,9 +438,7 @@ public class Farmer {
 
         System.out.println("Netherwart Farm Thread running");
 
-        robot.keyPress(KeyEvent.VK_8);
-        Thread.sleep(50);
-        robot.keyRelease(KeyEvent.VK_8);
+
 
         robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
         Thread.sleep(200);
@@ -460,11 +475,9 @@ public class Farmer {
             robot.keyRelease(KeyEvent.VK_W);
 
         }
-        System.out.println("Stopping attempt");
+        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 
-        releaseAll();
-
-        System.out.println("Stop succeeded");
+        System.out.println("Not Running");
     }
     public void pumpkin() throws ExecutionException, InterruptedException, AWTException {
         robot.mouseMove(0, 0);
@@ -571,6 +584,74 @@ public class Farmer {
         }
     }
 
+    public void moveMouse(double outcomeX, double outcomeY) throws IOException, InterruptedException, UnsupportedFlavorException, AWTException {
+        System.out.println("Want to go to " + outcomeX + ", " + outcomeY);
+
+        robot.keyPress(KeyEvent.VK_F3);
+        Thread.sleep(100);
+        robot.keyPress(KeyEvent.VK_C);
+        Thread.sleep(100);
+        robot.keyRelease(KeyEvent.VK_C);
+        Thread.sleep(100);
+        robot.keyRelease(KeyEvent.VK_F3);
+
+        while (true) {
+            // Get location stats
+            robot.keyPress(KeyEvent.VK_F3);
+            Thread.sleep(100);
+            robot.keyPress(KeyEvent.VK_C);
+            Thread.sleep(100);
+            robot.keyRelease(KeyEvent.VK_C);
+            Thread.sleep(100);
+            robot.keyRelease(KeyEvent.VK_F3);
+
+            //Extract data from clipboard
+            Toolkit toolkit = Toolkit.getDefaultToolkit();
+            Clipboard clipboard = toolkit.getSystemClipboard();
+            String result = (String) clipboard.getData(DataFlavor.stringFlavor);
+            System.out.println("String from Clipboard:" + result);
+
+            String[] trimmedValues = result.substring(60, result.length()).split(" ");
+
+            // Convert to 360 rotation system
+            double currentMinecraftX = Math.abs((double)((int)(Double.parseDouble(trimmedValues[0]) * 10))/10);
+            double currentMinecraftY = (double)((int)(Double.parseDouble(trimmedValues[1]) * 10))/10;
+
+            System.out.println("Minecraft X: " + currentMinecraftX + " Minecraft Y: " + currentMinecraftY);
+            // Actual mouse on screen coords
+            int currentX = (int) MouseInfo.getPointerInfo().getLocation().getX();
+            int currentY = (int) MouseInfo.getPointerInfo().getLocation().getY();
+
+            // Figure out which way to move the mouse to correct for x and y, should be easy for everything but 0 and 180 because of how the xy coords become negative instead of going to 360
+            if (currentMinecraftX < outcomeX) {
+                System.out.println("Move mouse left");
+                robot.mouseMove(currentX - 10, currentY);
+            } else if (currentMinecraftX > outcomeX) {
+                System.out.println("Move mouse right");
+                robot.mouseMove(currentX + 10, currentY);
+            } else {
+                System.out.println("X is good enough");
+            }
+
+            if (currentMinecraftY < outcomeY) {
+                System.out.println("Move mouse down");
+                robot.mouseMove(currentX, currentY + 10);
+            } else if (currentMinecraftY > outcomeY) {
+                System.out.println("Move mouse up");
+                robot.mouseMove(currentX, currentY - 10);
+            } else {
+                System.out.println("Y is good enough");
+            }
+
+
+            // checks if good enough
+            if (currentMinecraftX == outcomeX && currentMinecraftY == outcomeY) {
+                System.out.println("It's at a good enough accuracy");
+                return;
+            }
+        }
+    }
+
     public static String f3Information() throws AWTException {
         Robot robot = new Robot();
 
@@ -582,11 +663,37 @@ public class Farmer {
         return "";
     }
 
+    public static String getLocation() throws InterruptedException, IOException, UnsupportedFlavorException, AWTException {
+        Robot robot = new Robot();
+
+        // Copy location to the clipboard
+        robot.keyPress(KeyEvent.VK_F3);
+        Thread.sleep(100);
+        robot.keyPress(KeyEvent.VK_C);
+        Thread.sleep(100);
+        robot.keyRelease(KeyEvent.VK_F3);
+        Thread.sleep(100);
+        robot.keyRelease(KeyEvent.VK_C);
+
+        //Extract data from clipboard
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Clipboard clipboard = toolkit.getSystemClipboard();
+        String result = (String) clipboard.getData(DataFlavor.stringFlavor);
+        System.out.println("String from Clipboard:" + result);
+
+        return result;
+    }
+
     public void releaseAll() {
         for (int i = 65; i < 122; i++) {
             robot.keyRelease(i);
         }
         robot.mousePress(1);
         robot.mouseRelease(1);
+    }
+
+    public static void mouseDown() throws AWTException {
+        Robot robot = new Robot();
+        robot.mousePress(1);
     }
 }
