@@ -37,7 +37,7 @@ public class Bot {
     private static String finalUser;
     private static DiscordClient client;
     private static GatewayDiscordClient gateway;
-    private RestChannel general;
+    private static RestChannel general;
     private static String computerPassword = "";
 
     private static ArrayList<String> sendMessages = new ArrayList<String>();
@@ -77,7 +77,7 @@ public class Bot {
             String stringMessage = message.getContent();
             System.out.println(stringMessage);
 
-            if (message.getContent().length() > 4 && "!ping".equals(message.getContent())) {
+            if (message.getContent().length() > 4 && "!ping".equalsIgnoreCase(message.getContent())) {
                 final MessageChannel channel = message.getChannel().block();
                 channel.createMessage("Pong!").block();
             }
@@ -88,13 +88,14 @@ public class Bot {
                 System.out.println(message.getChannel());
             }
 
-            if (message.getContent().length() > 4 && "!help".equals(message.getContent())) {
+            if (message.getContent().length() > 4 && "!help".equalsIgnoreCase(message.getContent())) {
                 final MessageChannel channel = message.getChannel().block();
                 channel.createMessage("You can !ping, !ohhey, !dosomething, !roastme, and !help.").block();
+                channel.createMessage("Also !c, !pause, !resume, !f3 and f1 are kinda broken, !specificInfo and !ss.").block();
                 channel.createMessage("That's all I got").block();
             }
 
-            if (message.getContent().length() > 5 && "!ohhey".equals(message.getContent())) {
+            if (message.getContent().length() > 5 && "!ohhey".equalsIgnoreCase(message.getContent())) {
                 final MessageChannel channel = message.getChannel().block();
                 int temp = random.nextInt(2);
                 if (temp == 0) {
@@ -105,9 +106,8 @@ public class Bot {
                 System.exit(0);
             }
 
-            if (message.getContent().length() > 6 && "!resume".equals(message.getContent()) && message.getAuthor().toString().contains(finalUser)) {
-                SafetyNet.startRunning();
-
+            if (message.getContent().length() > 6 && "!resume".equalsIgnoreCase(message.getContent()) && message.getAuthor().toString().contains(finalUser)) {
+                SafetyNet.changeRunning(true);
 //                try {
 //                    Thread.sleep(2000);
 //                } catch (InterruptedException e) {
@@ -120,7 +120,21 @@ public class Bot {
 //                }
             }
 
-            if (message.getContent().length() > 2 && "!f3".equals(message.getContent()) && message.getAuthor().toString().contains(finalUser)) {
+            if (message.getContent().length() > 5 && "!pause".equalsIgnoreCase(message.getContent()) && message.getAuthor().toString().contains(finalUser)) {
+                SafetyNet.changeRunning(false);
+//                try {
+//                    Thread.sleep(2000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                try {
+//                    Farmer.mouseDown();
+//                } catch (AWTException e) {
+//                    e.printStackTrace();
+//                }
+            }
+
+            if (message.getContent().length() > 2 && "!f3".equalsIgnoreCase(message.getContent()) && message.getAuthor().toString().contains(finalUser)) {
                 Robot robot = null;
 
                 try {
@@ -132,7 +146,7 @@ public class Bot {
                 robot.keyPress(KeyEvent.VK_F3);
             }
 
-            if (message.getContent().length() > 2 && "!f1".equals(message.getContent()) && message.getAuthor().toString().contains(finalUser)) {
+            if (message.getContent().length() > 2 && "!f1".equalsIgnoreCase(message.getContent()) && message.getAuthor().toString().contains(finalUser)) {
                 Robot robot = null;
 
                 try {
@@ -144,13 +158,13 @@ public class Bot {
                 robot.keyPress(KeyEvent.VK_F1);
             }
 
-            if (message.getContent().length() > 7 && "!unstuck".equals(message.getContent()) && message.getAuthor().toString().contains(finalUser)) {
+            if (message.getContent().length() > 7 && "!unstuck".equalsIgnoreCase(message.getContent()) && message.getAuthor().toString().contains(finalUser)) {
                 Farmer.unstuck();
 
                 SafetyNet.resetTime();
             }
 
-            if (("!pass".equals(message.getContent()) || "!password".equals(message.getContent())) && message.getAuthor().toString().contains(finalUser)) {
+            if (("!pass".equalsIgnoreCase(message.getContent()) || "!password".equalsIgnoreCase(message.getContent())) && message.getAuthor().toString().contains(finalUser)) {
                 try {
                     type(computerPassword);
                 } catch (AWTException e) {
@@ -160,7 +174,7 @@ public class Bot {
                 }
             }
 
-            if (("!ss".equals(message.getContent()) || "!screenshot".equals(message.getContent())) && message.getAuthor().toString().contains(finalUser)) {
+            if (("!ss".equalsIgnoreCase(message.getContent()) || "!screenshot".equalsIgnoreCase(message.getContent())) && message.getAuthor().toString().contains(finalUser)) {
                 final MessageChannel channel = message.getChannel().block();
 
                 Robot robot = null;
@@ -206,7 +220,7 @@ public class Bot {
                 }).block();
             }
 
-            if (message.getContent().length() > 1 && "!c".equals(message.getContent())) {
+            if (message.getContent().length() > 1 && "!c".equalsIgnoreCase(message.getContent())) {
                 Robot robot = null;
                 try {
                     robot = new Robot();
@@ -223,12 +237,12 @@ public class Bot {
                 robot.keyRelease(KeyEvent.VK_C);
             }
 
-            if (message.getContent().length() > 11 && "!dosomething".equals(message.getContent())) {
+            if (message.getContent().length() > 11 && "!dosomething".equalsIgnoreCase(message.getContent())) {
                 final MessageChannel channel = message.getChannel().block();
                 channel.createMessage("no").block();
             }
 
-            if (message.getContent().length() > 4 && "!info".equals(message.getContent())) {
+            if (message.getContent().length() > 4 && "!info".equalsIgnoreCase(message.getContent())) {
                 final MessageChannel channel = message.getChannel().block();
                 try {
                     channel.createMessage(APIForHypixelData.formattedInfo(finalUser, Eggrollean)).block();
@@ -240,7 +254,7 @@ public class Bot {
                 }
             }
 
-            if (message.getContent().length() > 6 && "!roastme".equals(message.getContent())) {
+            if (message.getContent().length() > 6 && "!roastme".equalsIgnoreCase(message.getContent())) {
                 final MessageChannel channel = message.getChannel().block();
                 int temp = random.nextInt(2);
                 if (temp == 0) {
@@ -250,7 +264,13 @@ public class Bot {
                 }
             }
 
-            if (message.getContent().length() > 13 && "!specificInfo".equals(message.getContent().substring(0, 13))) {
+            if (message.getContent().length() > 11 && "!changePanic".equalsIgnoreCase(message.getContent())) {
+                final MessageChannel channel = message.getChannel().block();
+
+                channel.createMessage(SafetyNet.changePanic()).block();
+            }
+
+            if (message.getContent().length() > 13 && "!specificInfo".equalsIgnoreCase(message.getContent().substring(0, 13))) {
                 final MessageChannel channel = message.getChannel().block();
 
                 //Split into username and uuid
@@ -273,13 +293,13 @@ public class Bot {
                 }
             }
 
-            if (message.getContent().length() > 10 && "!getChannel".equals(message.getContent())) {
+            if (message.getContent().length() > 10 && "!getChannel".equalsIgnoreCase(message.getContent())) {
                 System.out.println(message.getChannelId());
                 final MessageChannel channel = message.getChannel().block();
                 channel.createMessage(message.getChannelId() + " is the channel").block();
             }
 
-            if (message.getContent().length() > 12 && ("!emergencyoff".equals(message.getContent())) || "!emergencyOff".equals(message.getContent())) {
+            if (message.getContent().length() > 12 && ("!emergencyoff".equalsIgnoreCase(message.getContent()))) {
                 final MessageChannel channel = message.getChannel().block();
                 if (message.getAuthor().toString().contains(finalUser)) {
                     channel.createMessage("Shutting Down").block();
@@ -292,7 +312,7 @@ public class Bot {
         gateway.onDisconnect().block();
     }
 
-    public void sendUpdates() {
+    public void sendUpdates() throws InterruptedException {
         while (true) {
             if (sendMessages.size() >= 1) {
                 System.out.println(sendMessages.get(0));
@@ -302,6 +322,7 @@ public class Bot {
                             return null;
                         })).block();
             }
+            Thread.sleep(100);
         }
     }
 
@@ -310,13 +331,13 @@ public class Bot {
         sendMessages.add(message);
     }
 
-//    public void sendMessage(String message) {
-//        client.withGateway((GatewayDiscordClient gateway) ->
-//                gateway.on(ReadyEvent.class, event -> {
-//                    general.createMessage(message).block();
-//                    return null;
-//                })).block();
-//    }
+    public void sendMessage(String message) {
+        client.withGateway((GatewayDiscordClient gateway) ->
+                gateway.on(ReadyEvent.class, event -> {
+                    general.createMessage(message).block();
+                    return null;
+                })).block();
+    }
 
     public static void type(String message) throws AWTException, InterruptedException {
         int[] printValues = convertStringToASCII(message);

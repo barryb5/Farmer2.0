@@ -21,13 +21,19 @@ public class SafetyNet {
     private static boolean running = true;
     private int previousX;
     private int previousZ;
+    private int layer;
+    private String whereAmI;
+    private static boolean panicking;
 
     public SafetyNet() {
         recentLog = "";
         running = true;
         previousX = 0;
         previousZ = 0;
+        layer = 0;
+        whereAmI = "dynamic";
         Bot.add("Starting");
+        panicking = false;
 
     }
 
@@ -35,8 +41,10 @@ public class SafetyNet {
         return running;
     }
 
-    public static void startRunning() {
-        running = true;
+    public static void changeRunning(boolean update) {
+        if (panicking){
+            running = update;
+        }
     }
 
     public void safeMacro() throws ExecutionException, InterruptedException, AWTException, IOException, UnsupportedFlavorException {
@@ -50,6 +58,7 @@ public class SafetyNet {
 //            checkMouseMoved();
             Thread.sleep(1000);
             getLocationWithF3();
+            manualCheckIfStuck();
 
             Bot.add("Seems Good");
 
@@ -74,12 +83,13 @@ public class SafetyNet {
 
         if (!location.equals("dynamic")) {
             System.out.println("We got warped here: " + location);
+            whereAmI = location;
             panicLevel2();
         } else {
             System.out.println("Still on island");
 
             // If for some reason not running farmer while on island, start running farmer
-            if (running != true) {
+            if (running != true && whereAmI.equals("dynamic")) {
                 running = true;
             }
         }
@@ -101,11 +111,13 @@ public class SafetyNet {
 
 //        File file = new File("/home/barry/.minecraft/skyclient/logs/latest.log");
 //        File file = new File("/home/barry/.lunarclient/logs/launcher/renderer.log");
-        File file = new File("/home/barry/Downloads/projects-java-20220220T215900Z-001/Sandbox/logs/blclient/minecraft/latest.log");
+        File file = new File("/home/barry/Downloads/projects-java-20220220T215900Z-001/Sandbox/logs/latest.log");
 
         ReversedLinesFileReader fr = new ReversedLinesFileReader(file);
         fr.readLine();
         String latestLine = fr.readLine();
+        // Test to see if it found the file
+//        System.out.println(latestLine + "\n" + fr.readLine());
         // Is a chat message
         if (latestLine != null) {
             while (!latestLine.contains("[CHAT]") || latestLine.contains("Copied location to clipboard")) {
@@ -124,6 +136,10 @@ public class SafetyNet {
             // Checks if tp padded is visiting
             else if (latestLine.contains("Warped from the") && latestLine.contains("End Teleport Pad") && latestLine.contains("Start Teleport Pad")) {
                 System.out.println("Attempting unstuck");
+                // Update layer to latest layer
+                layer = Integer.parseInt(latestLine.substring(latestLine.indexOf(" NW Start Teleport Pad") - 1, latestLine.indexOf(" NW Start Teleport Pad")));
+                System.out.println(latestLine.substring(latestLine.indexOf(" F"), latestLine.indexOf(" Teleport Pad!")));
+                System.out.println("Layer: " + layer);
                 Bot.add(latestLine);
                 Farmer.unstuck();
             } else if (latestLine.contains("This server will restart soon") && latestLine.contains("[Important]")) {
@@ -216,22 +232,10 @@ public class SafetyNet {
         if (result.contains("minecraft:the_end")) {
             // Probably in limbo
             Bot.type("/lobby skyblock");
-
-            robot.keyPress(KeyEvent.VK_R);
-            Thread.sleep(50);
-            robot.keyRelease(KeyEvent.VK_R);
-            Thread.sleep(50);
-            robot.mousePress(KeyEvent.BUTTON3_DOWN_MASK);
-            Thread.sleep(50);
-            robot.mouseRelease(KeyEvent.BUTTON3_DOWN_MASK);
-            Thread.sleep(50);
-            robot.mousePress(KeyEvent.BUTTON1_DOWN_MASK);
-            Thread.sleep(50);
-            robot.mouseRelease(KeyEvent.BUTTON1_DOWN_MASK);
-            Thread.sleep(4000);
-            robot.keyPress(KeyEvent.VK_C);
-            Thread.sleep(50);
-            robot.keyRelease(KeyEvent.VK_C);
+            Thread.sleep(5000);
+        }
+        if (location[0] < 154 && location[0] > 142 && location[1] == 69 && location[2] > 144 && location[2] < 152) {
+            Bot.type("/skyblock");
         }
 
 //        // Compare to previous xz value, if it's the same then we know we are stuck
@@ -248,14 +252,27 @@ public class SafetyNet {
 //        }
     }
 
+    public static String changePanic() {
+        if (panicking) {
+            panicking = false;
+            return "Panicking went from true to false";
+        } else {
+            panicking = true;
+            return "Panicking went from false to true";
+        }
+    }
+
     public void panicLevel1() {
         System.out.println("Stop macro");
         running = false;
+//        panicking = true;
 //        System.exit(0);
     }
 
-    public void panicLevel2() throws InterruptedException, AWTException {
+    // Assumes that you're in the hubc
+    public void panicLevel2() throws InterruptedException, AWTException, ExecutionException {
         running = false;
+        panicking = true;
         Robot robot = new Robot();
 
 //        Thread.sleep(80000);
@@ -268,8 +285,24 @@ public class SafetyNet {
         Thread.sleep(4000);
         robot.keyRelease(KeyEvent.VK_W);
 
-        Bot.type("/is");
+        String location;
+        do {
+            Thread.sleep(500);
 
+            Bot.type("/is");
+
+            String raw = APIForHypixelData.getInfo(Eggrollean);
+
+            location = raw.substring(raw.indexOf("mode=") + 5, raw.indexOf("map=") - 2);
+
+            if (location.equals("dynamic")) {
+                System.out.println("We got warped here: " + location);
+                whereAmI = location;
+            }
+        } while (!whereAmI.equals("dynamic"));
+
+
+        panicking = false;
 //        System.exit(0);
     }
 
@@ -277,6 +310,8 @@ public class SafetyNet {
     public void panicLevel3() throws AWTException, InterruptedException {
         // Log out
         System.out.println("End Minecraft");
+
+        panicking = true;
 
         // Crashes Minecraft
         Robot robot = new Robot();

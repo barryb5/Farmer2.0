@@ -446,11 +446,11 @@ public class Farmer {
         while (SafetyNet.isRunning()) {
             // Walk left
             robot.keyPress(KeyEvent.VK_A);
-            Thread.sleep(34500 + (random.nextInt(100) + 250));
+            Thread.sleep(34000/* + (random.nextInt(100) + 250)*/);
             robot.keyRelease(KeyEvent.VK_A);
 
             robot.keyPress(KeyEvent.VK_CONTROL);
-            Thread.sleep(100);
+            Thread.sleep(50);
             robot.keyPress(KeyEvent.VK_W);
             Thread.sleep(50);
             robot.keyRelease(KeyEvent.VK_CONTROL);
@@ -459,15 +459,11 @@ public class Farmer {
 
             // Walk right
             robot.keyPress(KeyEvent.VK_D);
-            try {
-                Thread.sleep(34500 + (random.nextInt(100) + 250));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            Thread.sleep(34000/* + (random.nextInt(100) + 250)*/);
             robot.keyRelease(KeyEvent.VK_D);
 
             robot.keyPress(KeyEvent.VK_CONTROL);
-            Thread.sleep(100);
+            Thread.sleep(50);
             robot.keyPress(KeyEvent.VK_W);
             Thread.sleep(50);
             robot.keyRelease(KeyEvent.VK_CONTROL);

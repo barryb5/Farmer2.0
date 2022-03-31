@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter;
 public class Main {
 
     public static void main(String[] args) throws AWTException, IOException, InterruptedException, NoSuchFileException, ExecutionException, UnsupportedFlavorException {
-        Thread botSendThread = new Thread(new Runnable() {
+        Thread botThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 System.out.println("Bot Send thread running");
@@ -34,12 +34,16 @@ public class Main {
             }
         });
 
-        Thread botThread = new Thread(new Runnable() {
+        Thread botSendThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 System.out.println("Bot thread running");
                 Bot bot = new Bot();
-                bot.sendUpdates();
+                try {
+                    bot.sendUpdates();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -72,9 +76,20 @@ public class Main {
                 while (true) {
                     String time = java.time.LocalTime.now().toString();
                     System.out.println("Time: " + time);
-                    if (time.substring(0, 5).equals("05:28")) {
+                    if (time.substring(0, 5).equals("04:28")) {
                         System.out.println("Done now");
                         System.exit(0);
+
+                        Runtime runtime = Runtime.getRuntime();
+                        try
+                        {
+                            System.out.println("Shutting down the PC after 5 seconds.");
+                            runtime.exec("shutdown -s -t 5");
+                        }
+                        catch(IOException e)
+                        {
+                            System.out.println("Exception: " +e);
+                        }
                     }
 
 
@@ -139,7 +154,7 @@ public class Main {
         farmerThread.start();
         safetyNetThread.start();
         botThread.start();
-        botSendThread.start();
+//        botSendThread.start();
         stopAfterTimeThread.start();
 /*
         Robot robot = new Robot();

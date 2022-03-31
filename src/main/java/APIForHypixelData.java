@@ -126,7 +126,7 @@ public class APIForHypixelData {
 //        }
 
         PlayerReply.Player player = apiReply/*.get()*/.getPlayer();
-        if (!player.exists()) {
+        if (player != null && !player.exists()) {
             System.err.println("Player not found!");
 
             hypixelAPI.shutdown();
